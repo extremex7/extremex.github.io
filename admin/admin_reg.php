@@ -1,6 +1,6 @@
 <?php
 session_start();
-if(isset($_SESSION['user_id'])){
+if(isset($_SESSION['admin_id'])){
     header('Location: ../index.php');
     exit();
 }
@@ -71,15 +71,14 @@ if(isset($_SESSION['user_id'])){
   </style>
   <script>
 function validateForm() {
-  var firstName = document.getElementById("first_name").value;
-  var lastName = document.getElementById("last_name").value;
+  var adminName = document.getElementById("admin_name").value;
   var email = document.getElementById("email").value;
   var password = document.getElementById("password").value;
   var confirmPassword = document.getElementById("confirm_password").value;
   var phone = document.getElementById("phone").value;
   var gender = document.querySelector('input[name="gender"]:checked');
   
-  if (firstName == "" || lastName == "" || email == "" || password == "" || confirmPassword == "" || phone == "" || gender == null) {
+  if (adminName == "" || email == "" || password == "" || confirmPassword == "" || phone == "" || gender == null) {
     alert("Please fill out all fields.");
     return false;
   }
@@ -149,14 +148,11 @@ function validateForm() {
 <!-- Section 3 -->
 <div class="max-w-md mx-auto my-8 bg-white p-6 rounded-md shadow-md">
   <h1 class="text-xl font-medium mb-4">Registration</h1>
-  <form action="../val/reg_val.php" method="post" onsubmit="return validateForm()">
+  <form action="admin_reg_val.php" method="post" onsubmit="return validateForm()">
+
     <div class="mb-4">
-      <label class="block text-gray-700 font-medium mb-2" for="first_name">First Name</label>
-      <input class="border border-gray-300 p-2 w-full" type="text" id="first_name" name="first_name" required>
-    </div>
-    <div class="mb-4">
-      <label class="block text-gray-700 font-medium mb-2" for="last_name">Last Name</label>
-      <input class="border border-gray-300 p-2 w-full" type="text" id="last_name" name="last_name" required>
+      <label class="block text-gray-700 font-medium mb-2" for="admin_name">Name</label>
+      <input class="border border-gray-300 p-2 w-full" type="text" id="admin_name" name="admin_name" required>
     </div>
     <div class="mb-4">
       <label class="block text-gray-700 font-medium mb-2" for="email">Email Address</label>
@@ -191,7 +187,7 @@ function validateForm() {
       <button class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700" type="submit">Register</button>
     </div>
   </form>
-  <p class="text-gray-600 text-sm">Already have an account? <a class="text-blue-500" href="user_login.php">Login here</a>.</p>
+  <p class="text-gray-600 text-sm">Already have an account? <a class="text-blue-500" href="admin_login.php">Login here</a>.</p>
 </div>
 
 <!-- info section -->
@@ -228,7 +224,7 @@ function validateForm() {
           <a class="" href="../main/gallery.php">Gallery</a>
         </li>
         <li class="">
-          <a class="" href="#">Login</a>
+          <a class="" href="../user/user_login.php">Login</a>
         </li>
       </ul>
     </div>

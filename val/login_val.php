@@ -14,13 +14,14 @@ if(isset($_POST['email']) && isset($_POST['password'])) {
 
     if($result->num_rows == 1) { // If there is a user with matching email
         $user = $result->fetch_assoc();
+        $hashedPasswordFromDatabase = $user['Password']; // Fetch the hashed password from the database
 
         // Use password_verify() function to check if entered password matches the hashed password
-        if(password_verify($password, $user['password'])) {
+        if(password_verify($password, $hashedPasswordFromDatabase)) {
             // Store user data in session variables
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['user_name'] = $user['first_name'].$user['last_name'];
-            $_SESSION['user_email'] = $user['email'];
+            $_SESSION['user_id'] = $user['ID'];
+            $_SESSION['user_name'] = $user['First_Name'] . ' ' . $user['Last_Name'];
+            $_SESSION['user_email'] = $user['Email'];
 
             // Redirect to home page
             header("Location: ../index.php?status=success");
@@ -33,5 +34,4 @@ if(isset($_POST['email']) && isset($_POST['password'])) {
     exit();
 } 
 $conn->close();
-
 ?>

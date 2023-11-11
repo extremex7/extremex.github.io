@@ -116,58 +116,15 @@ if(isset($_SESSION['user_id'])) {
   <section class="about_section layout_padding">
     <div class="container">
       <div class="heading_container">
-        <h2>Booking
+        <h2>Book
         </h2>
       </div>
       <div class="box">
-      <form action="process_booking.php" method="post" onsubmit="return validateForm()">
-    <label for="facility">Select Facility:</label>
-    <select name="facility" id="facility">
-        <!-- Options for facility selection -->
-        <option value="FC001">Futsal A</option>
-        <option value="FC002">Futsal B</option>
-        <option value="FC003">Basketball</option>
-    </select>
-    <br>
-    <label for="date">Preferred Date From:</label>
-    <input type="date" name="date_from" id="date_from">
-    <br>
-    <label for="date">Preferred Date to:</label>
-    <input type="date" name="date_to" id="date_to">
-    <br>
-    <label for="time">Preferred Time From:</label>
-    <input type="time" name="time_from" id="time_from">
-    <br>
-    <label for="time">Preferred Time To:</label>
-    <input type="time" name="time_to" id="time_to">
-    <br>
-    <input type="submit" value="Submit">
-</form>
-      </div>
+            <p>Booking Successful! <a href="../user/myBooking.php"> Click here </a>to view your bookings.</p>
+    </div>
     </div>
   </section>
   <!-- end booking section -->
-  <script>
-    function validateForm() {
-        // Get the selected date and time
-        var date_from = document.getElementById("date_from").value;
-        var time_from = document.getElementById("time_from").value;
-
-        // Convert the selected date and time to a Date object
-        var selectedDateTime = new Date(date_from + " " + time_from);
-
-        // Get the current internet time
-        var currentDateTime = new Date();
-
-        // Check if the selected date and time have already passed
-        if (selectedDateTime < currentDateTime) {
-            alert("Invalid date or time selection. Please choose a future date and time.");
-            return false; // Prevent form submission
-        }
-
-        return true; // Allow form submission
-    }
-</script>
 
  <!-- info section -->
 
@@ -203,7 +160,7 @@ if(isset($_SESSION['user_id'])) {
           <a class="" href="../main/gallery.php">Gallery</a>
         </li>
         <li class="">
-          <a class="" href="../user/user_login.php">Login</a>
+          <a class="" href="#">Login</a>
         </li>
       </ul>
     </div>

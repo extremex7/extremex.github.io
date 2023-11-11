@@ -1,3 +1,67 @@
+<?php
+session_start();
+require_once '../val/db_connect.php';
+
+// Check if the user is logged in
+if (!isset($_SESSION['user_id'])) {
+    header('Location: user_login.php');
+    exit();
+}
+// Fetch user details from the database
+$sql = "SELECT * FROM users WHERE id = " . $_SESSION['user_id'];
+$result = $conn->query($sql);
+$userData = $result->fetch_assoc();
+
+// Check if the form is submitted
+if (isset($_POST['submit'])) {
+    $first_name = $_POST['first_name'];
+    $last_name = $_POST['last_name'];
+    $email = $_POST['email'];
+    $phone = $_POST['phone'];
+    $gender = $_POST['gender'];
+    $old_password = $_POST['old_password'];
+    $new_password = $_POST['new_password'];
+    $confirm_password = $_POST['confirm_password'];
+
+    // Validate and update user data
+    $errors = [];
+
+    // Check if the old password matches the database password
+    if (!password_verify($old_password, $userData['Password'])) {
+        $errors[] = "Invalid old password.";
+    }
+
+    // Check if the new password and confirm password match
+    if (!empty($new_password) && $new_password !== $confirm_password) {
+        $errors[] = "New password and confirm password do not match.";
+    }
+
+    // If there are no errors, update the user data
+    if (empty($errors)) {
+        // Update user data in the database
+        $updateSql = "UPDATE users SET First_Name = '$first_name', Last_Name = '$last_name', Email = '$email', Phone = '$phone', Gender = '$gender'";
+
+        // Update the password if a new password is provided
+        if (!empty($new_password)) {
+            $hashedPassword = password_hash($new_password, PASSWORD_DEFAULT);
+            $updateSql .= ", Password = '$hashedPassword'";
+        }
+
+        $updateSql .= " WHERE id = " . $_SESSION['user_id'];
+
+        if ($conn->query($updateSql) === TRUE) {
+            echo "Profile updated successfully.";
+            // Redirect to the profile page or any other desired page
+            header('Location: user_profile.php');
+            exit();
+        } else {
+            echo "Error updating profile: " . $conn->error;
+        }
+    }
+}
+
+// Display the user profile form
+?>
 <!DOCTYPE html>
 <html>
 
@@ -49,18 +113,6 @@
 <body class="sub_page about_page">
   <div class="hero_area">
     <!-- header section strats -->
-    <?php
-session_start();
-require_once '../val/db_connect.php';
-
-if(isset($_SESSION['user_id'])) {
-    // Fetch user details from the database
-    $sql = "SELECT first_name FROM users WHERE id = ".$_SESSION['user_id'];
-    $result = $conn->query($sql);
-    $user = $result->fetch_assoc();
-
-    // Display dropdown menu with user name and links
-    echo '
     <header class="header_section">
       <div class="container">
         <nav class="navbar navbar-expand-lg custom_nav-container">
@@ -95,14 +147,9 @@ if(isset($_SESSION['user_id'])) {
                   </li>
                   <li class="nav-item">
                     <a class="nav-link" href="user_profile.php">Profile</a>
-              <li class="nav-item">
+                    <li class="nav-item">
                     <a class="nav-link" href="../user/logout.php">Logout</a>
-                  </li>';
-            } else {
-                header('Location: ../user/user_login.php');
-                exit();
-            }
-            ?>
+                  </li>
                 </ul>
               </div>
             </div>
@@ -111,63 +158,67 @@ if(isset($_SESSION['user_id'])) {
       </div>
     </section>
 
-  <!-- booking section -->
+  <!-- form section -->
 
   <section class="about_section layout_padding">
     <div class="container">
       <div class="heading_container">
-        <h2>Booking
+        <h2>
+          Manage Account
         </h2>
       </div>
       <div class="box">
-      <form action="process_booking.php" method="post" onsubmit="return validateForm()">
-    <label for="facility">Select Facility:</label>
-    <select name="facility" id="facility">
-        <!-- Options for facility selection -->
-        <option value="FC001">Futsal A</option>
-        <option value="FC002">Futsal B</option>
-        <option value="FC003">Basketball</option>
+      <form method="POST" action="user_profile.php">
+  <div class="form-group">
+    <label for="first_name">First Name:</label>
+    <input type="text" class="form-control" id="first_name" name="first_name" value="<?php echo $userData['First_Name']; ?>" required>
+  </div>
+
+  <div class="form-group">
+    <label for="last_name">Last Name:</label>
+    <input type="text" class="form-control" id="last_name" name="last_name" value="<?php echo $userData['Last_Name']; ?>" required>
+  </div>
+
+  <div class="form-group">
+    <label for="email">Email:</label>
+    <input type="email" class="form-control" id="email" name="email" value="<?php echo $userData['Email']; ?>" required>
+  </div>
+
+  <div class="form-group">
+    <label for="phone">Phone:</label>
+    <input type="tel" class="form-control" id="phone" name="phone" value="<?php echo $userData['Phone']; ?>" required>
+  </div>
+
+  <div class="form-group">
+    <label for="gender">Gender:</label>
+    <select class="form-control" id="gender" name="gender" required>
+      <option value="Male" <?php if ($userData['Gender'] === 'Male') echo 'selected'; ?>>Male</option>
+      <option value="Female" <?php if ($userData['Gender'] === 'Female') echo 'selected'; ?>>Female</option>
+      <option value="Other" <?php if ($userData['Gender'] === 'Other') echo 'selected'; ?>>Other</option>
     </select>
-    <br>
-    <label for="date">Preferred Date From:</label>
-    <input type="date" name="date_from" id="date_from">
-    <br>
-    <label for="date">Preferred Date to:</label>
-    <input type="date" name="date_to" id="date_to">
-    <br>
-    <label for="time">Preferred Time From:</label>
-    <input type="time" name="time_from" id="time_from">
-    <br>
-    <label for="time">Preferred Time To:</label>
-    <input type="time" name="time_to" id="time_to">
-    <br>
-    <input type="submit" value="Submit">
+  </div>
+
+  <div class="form-group">
+    <label for="old_password">Old Password:</label>
+    <input type="password" class="form-control" id="old_password" name="old_password" autocomplete="off" required>
+  </div>
+
+  <div class="form-group">
+    <label for="new_password">New Password:</label>
+    <input type="password" class="form-control" id="new_password" name="new_password">
+  </div>
+
+  <div class="form-group">
+    <label for="confirm_password">Confirm Password:</label>
+    <input type="password" class="form-control" id="confirm_password" name="confirm_password">
+  </div>
+
+  <button type="submit" name="submit" class="btn btn-primary">Update Profile</button>
 </form>
-      </div>
-    </div>
-  </section>
-  <!-- end booking section -->
-  <script>
-    function validateForm() {
-        // Get the selected date and time
-        var date_from = document.getElementById("date_from").value;
-        var time_from = document.getElementById("time_from").value;
-
-        // Convert the selected date and time to a Date object
-        var selectedDateTime = new Date(date_from + " " + time_from);
-
-        // Get the current internet time
-        var currentDateTime = new Date();
-
-        // Check if the selected date and time have already passed
-        if (selectedDateTime < currentDateTime) {
-            alert("Invalid date or time selection. Please choose a future date and time.");
-            return false; // Prevent form submission
-        }
-
-        return true; // Allow form submission
-    }
-</script>
+</div>
+</div>
+</section>
+  <!-- end form section -->
 
  <!-- info section -->
 
@@ -203,7 +254,7 @@ if(isset($_SESSION['user_id'])) {
           <a class="" href="../main/gallery.php">Gallery</a>
         </li>
         <li class="">
-          <a class="" href="../user/user_login.php">Login</a>
+          <a class="" href="#">Login</a>
         </li>
       </ul>
     </div>
@@ -278,4 +329,3 @@ function openNav() {
 </body>
 
 </html>
-

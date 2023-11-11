@@ -290,40 +290,26 @@ require_once 'val/db_connect.php';
       </div>
       <div class="Facilities_container">
         <div class="box">
-          <img src="images/s-1.jpg" alt="">
+          <img src="images/s-3.jpg" alt="">
           <h6 class="visible_heading">
-            Regular <br>Tournaments
+            Futsal A
           </h6>
           <div class="link_box">
-            <a href="">
+            <a href="booking.php">
               <img src="images/link.png" alt="">
             </a>
             <h6>
-              Tournaments
-            </h6>
-          </div>
-        </div>
-        <div class="box">
-          <img src="images/s-2.jpg" alt="">
-          <h6 class="visible_heading">
-            Training
-          </h6>
-          <div class="link_box">
-            <a href="">
-              <img src="images/link.png" alt="">
-            </a>
-            <h6>
-              Training
+              Book
             </h6>
           </div>
         </div>
         <div class="box">
           <img src="images/s-3.jpg" alt="">
           <h6 class="visible_heading">
-            Futsal <br> Booking
+            Futsal B
           </h6>
           <div class="link_box">
-            <a href="">
+            <a href="booking.php">
               <img src="images/link.png" alt="">
             </a>
             <h6>
@@ -334,11 +320,10 @@ require_once 'val/db_connect.php';
         <div class="box">
           <img src="images/s-4.jpg" alt="">
           <h6 class="visible_heading">
-            BasketBall Court <br>
-            Booking
+            BasketBall Court
           </h6>
           <div class="link_box">
-            <a href="">
+            <a href="booking.php">
               <img src="images/link.png" alt="">
             </a>
             <h6>
@@ -579,7 +564,7 @@ require_once 'val/db_connect.php';
               <a class="" href="#contactSection">Contact Us</a>
             </li>
             <li class="">
-              <a class="" href="#">Login</a>
+              <a class="" href="/user/user_login.php">Login</a>
             </li>
           </ul>
         </div>

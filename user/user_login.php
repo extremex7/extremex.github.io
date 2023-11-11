@@ -30,7 +30,7 @@ if(isset($_SESSION['user_id'])){
     
   <!-- Add Tailwind CSS CDN -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
 
   <!-- Custom styles for this template -->
   <link href="../css/style.css" rel="stylesheet" />
@@ -81,7 +81,7 @@ if(isset($_SESSION['user_id'])){
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                       <div class="d-flex  flex-column flex-lg-row align-items-center">
                         <ul class="navbar-nav  ">
-                          <li class="nav-item active">
+                          <li class="nav-item ">
                             <a class="nav-link" href="../index.php">Home <span class="sr-only">(current)</span></a>
                           </li>
                           <li class="nav-item">
@@ -93,9 +93,6 @@ if(isset($_SESSION['user_id'])){
                           <li class="nav-item">
                             <a class="nav-link" href="../main/gallery.php">Gallery</a>
                           </li>
-              <li class="nav-item">
-                <a class="nav-link" href="../user/user_login.php">Login</a>
-              </li>
                 </ul>
               </div>
             </div>
@@ -159,7 +156,10 @@ if(isset($_SESSION['user_id'])){
           <a class="" href="../main/gallery.php">Gallery</a>
         </li>
         <li class="">
-          <a class="" href="#">Login</a>
+          <a class="" href="../user/user_login.php">Login</a>
+        </li>
+        <li class="">
+          <a class="" href="../admin/admin_login.php">Admin</a>
         </li>
       </ul>
     </div>

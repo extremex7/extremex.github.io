@@ -23,7 +23,7 @@
     
   <!-- Add Tailwind CSS CDN -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
 
   <!-- Custom styles for this template -->
   <link href="css/style.css" rel="stylesheet" />
@@ -66,8 +66,8 @@ if(isset($_SESSION['user_id'])) {
     <header class="header_section">
               <div class="container">
                 <nav class="navbar navbar-expand-lg custom_nav-container">
-                  <a class="navbar-brand" href="../index.php">
-                    <img src="../images/logo.png" alt="" />
+                  <a class="navbar-brand" href="index.php">
+                    <img src="images/logo.png" alt="" />
                     <span>
                       Grande Sports Center
                     </span>
@@ -89,19 +89,19 @@ if(isset($_SESSION['user_id'])) {
                       <div class="d-flex  flex-column flex-lg-row align-items-center">
                         <ul class="navbar-nav  ">
                           <li class="nav-item active">
-                            <a class="nav-link" href="../index.php">Home <span class="sr-only">(current)</span></a>
+                            <a class="nav-link" href="index.php">Home <span class="sr-only">(current)</span></a>
                           </li>
                           <li class="nav-item">
-                            <a class="nav-link" href="../main/aboutus.php">About Us</a>
+                            <a class="nav-link" href="main/aboutus.php">About Us</a>
                           </li>
                           <li class="nav-item">
-                            <a class="nav-link" href="../main/facilities.php">Facilities </a>
+                            <a class="nav-link" href="main/facilities.php">Facilities </a>
                           </li>
                           <li class="nav-item">
-                            <a class="nav-link" href="../main/gallery.php">Gallery</a>
+                            <a class="nav-link" href="main/gallery.php">Gallery</a>
                           </li>
               <li class="nav-item">
-                <a class="nav-link" href="../user/user_login.php">Login</a>
+                <a class="nav-link" href="user/user_login.php">Login</a>
               </li>
                 </ul>
               </div>
@@ -128,7 +128,7 @@ if(isset($_SESSION['user_id'])) {
         <button class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700" type="submit">Login</button>
       </div>
     </form>
-    <p class="text-gray-600 text-sm">Don\'t have an account? <a class="text-blue-500" href="user_registration.php">Register here</a>.</p>
+    <p class="text-gray-600 text-sm">Don\'t have an account? <a class="text-blue-500" href="user/user_registration.php">Register here</a>.</p>
   </div>
 </section>
 
@@ -154,19 +154,19 @@ if(isset($_SESSION['user_id'])) {
       </h6>
       <ul>
         <li class=" active">
-          <a class="" href="../index.php">Home <span class="sr-only">(current)</span></a>
+          <a class="" href="index.php">Home <span class="sr-only">(current)</span></a>
         </li>
         <li class="">
-          <a class="" href="../main/aboutus.php">About </a>
+          <a class="" href="main/aboutus.php">About </a>
         </li>
         <li class="">
-          <a class="" href="../main/facilities.php">Facilities </a>
+          <a class="" href="main/facilities.php">Facilities </a>
         </li>
         <li class="">
-          <a class="" href="../main/gallery.php">Gallery</a>
+          <a class="" href="main/gallery.php">Gallery</a>
         </li>
         <li class="">
-          <a class="" href="#">Login</a>
+          <a class="" href="user/user_login.php">Login</a>
         </li>
       </ul>
     </div>
@@ -177,37 +177,37 @@ if(isset($_SESSION['user_id'])) {
       </h6>
       <div class="info_link-box">
         <a href="">
-          <img src="../images/location-white.png" alt="">
+          <img src="images/location-white.png" alt="">
           <span> Dhapasi, Tokha</span>
         </a>
         <a href="">
-          <img src="../images/call-white.png" alt="">
+          <img src="images/call-white.png" alt="">
           <span>+01 51592901</span>
         </a>
         <a href="">
-          <img src="../images/mail-white.png" alt="">
+          <img src="images/mail-white.png" alt="">
           <span> grandesportscenter@gmail.com</span>
         </a>
       </div>
       <div class="info_social">
         <div>
           <a href="">
-            <img src="../images/facebook-logo-button.png" alt="">
+            <img src="images/facebook-logo-button.png" alt="">
           </a>
         </div>
         <div>
           <a href="">
-            <img src="../images/twitter-logo-button.png" alt="">
+            <img src="images/twitter-logo-button.png" alt="">
           </a>
         </div>
         <div>
           <a href="">
-            <img src="../images/linkedin.png" alt="">
+            <img src="images/linkedin.png" alt="">
           </a>
         </div>
         <div>
           <a href="">
-            <img src="../images/instagram.png" alt="">
+            <img src="images/instagram.png" alt="">
           </a>
         </div>
       </div>

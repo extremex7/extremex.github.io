@@ -94,12 +94,12 @@ if(isset($_SESSION['user_id'])) {
                     <a class="nav-link" href="myBooking.php">My Bookings</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="manageAccount.php">Profile</a>
+                    <a class="nav-link" href="user_profile.php">Profile</a>
               <li class="nav-item">
-                    <a class="nav-link" href="../user/logout.php">Logout</a>
+                    <a class="nav-link" href="logout.php">Logout</a>
                   </li>';
             } else {
-                header('Location: ../index.php');
+                header('Location: user_login.php');
                 exit();
             }
             ?>

@@ -20,6 +20,7 @@
 
   <!-- bootstrap core css -->
   <link rel="stylesheet" type="text/css" href="../css/bootstrap.css" />
+  <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 
   <!-- fonts style -->
   <link href="https://fonts.googleapis.com/css?family=Baloo+Chettan|Dosis:400,600,700|Poppins:400,600,700&display=swap"
@@ -43,6 +44,28 @@
     justify-content: center;
     align-items: center;
   }
+  .nav-tabs {
+      margin-bottom: 20px; /* Adjust as needed */
+    }
+
+    .nav-tabs .nav-link {
+      padding: 10px 20px; /* Adjust as needed */
+    }
+
+    .nav-tabs .nav-link.active {
+      background-color: #f0f0f0; /* Adjust as needed */
+    }
+
+    .tab-content {
+      padding: 20px;
+    }
+
+    /* Style for user/admin list item */
+    .list-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px; /* Adjust as needed */
+    }
 </style>
 </head>
 
@@ -52,12 +75,39 @@
     <?php
 session_start();
 require_once '../val/db_connect.php';
+?>
+<?php 
+function removeUser($userId) {
+    global $conn;
+    
+    // Your removal logic here
+    // ...
+}
 
-if(isset($_SESSION['user_id'])) {
+// Function to add a new user or admin
+function addUser($name, $email, $password, $isAdmin) {
+    global $conn;
+    
+    // Your addition logic here
+    // ...
+}
+
+// Fetch all users from the database
+$userSql = "SELECT * FROM users";
+$userResult = $conn->query($userSql);
+
+// Fetch all admins from the database
+$adminSql = "SELECT * FROM admin";
+$adminResult = $conn->query($adminSql);
+
+
+if(isset($_SESSION['admin_id'])) {
     // Fetch user details from the database
-    $sql = "SELECT first_name FROM users WHERE id = ".$_SESSION['user_id'];
+    $sql = "SELECT `name` FROM `admin` WHERE id = ".$_SESSION['admin_id'];
     $result = $conn->query($sql);
     $user = $result->fetch_assoc();
+
+    
 
     // Display dropdown menu with user name and links
     echo '
@@ -91,15 +141,15 @@ if(isset($_SESSION['user_id'])) {
                     <a class="nav-link" href="../index.php">Home<span class="sr-only">(current)</span></a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="myBooking.php">My Bookings</a>
+                    <a class="nav-link" href="view_bookings.php">View Bookings</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="user_profile.php">Profile</a>
+                    <a class="nav-link" href="manage_users.php">Manage Users</a>
               <li class="nav-item">
                     <a class="nav-link" href="../user/logout.php">Logout</a>
                   </li>';
             } else {
-                header('Location: ../user/user_login.php');
+                header('Location: admin_login.php');
                 exit();
             }
             ?>
@@ -110,64 +160,93 @@ if(isset($_SESSION['user_id'])) {
         </div>
       </div>
     </section>
+    
 
-  <!-- booking section -->
+ <!-- admin users and admins management section -->
+ <section class="about_section layout_padding">
+ <div class="container">
+  <div class="heading_container">
+    <h2>Users and Admins Management</h2>
+  </div>
 
-  <section class="about_section layout_padding">
-    <div class="container">
-      <div class="heading_container">
-        <h2>Booking
-        </h2>
-      </div>
-      <div class="box">
-      <form action="process_booking.php" method="post" onsubmit="return validateForm()">
-    <label for="facility">Select Facility:</label>
-    <select name="facility" id="facility">
-        <!-- Options for facility selection -->
-        <option value="FC001">Futsal A</option>
-        <option value="FC002">Futsal B</option>
-        <option value="FC003">Basketball</option>
-    </select>
-    <br>
-    <label for="date">Preferred Date From:</label>
-    <input type="date" name="date_from" id="date_from">
-    <br>
-    <label for="date">Preferred Date to:</label>
-    <input type="date" name="date_to" id="date_to">
-    <br>
-    <label for="time">Preferred Time From:</label>
-    <input type="time" name="time_from" id="time_from">
-    <br>
-    <label for="time">Preferred Time To:</label>
-    <input type="time" name="time_to" id="time_to">
-    <br>
-    <input type="submit" value="Submit">
-</form>
-      </div>
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" id="users-tab" data-toggle="tab" href="#users" role="tab" aria-controls="users" aria-selected="true">Users</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="admins-tab" data-toggle="tab" href="#admins" role="tab" aria-controls="admins" aria-selected="false">Admins</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="add-tab" data-toggle="tab" href="#add" role="tab" aria-controls="add" aria-selected="false">Add New User/Admin</a>
+    </li>
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <!-- Users Tab -->
+    <div class="tab-pane fade show active" id="users" role="tabpanel" aria-labelledby="users-tab">
+      <ul>
+        <?php
+        // Display list of users
+        while ($userRow = $userResult->fetch_assoc()) {
+          // Check if the keys 'id', 'first_name', and 'last_name' exist in $userRow
+          if (isset($userRow['ID']) && isset($userRow['First_Name']) && isset($userRow['Last_Name'])) {
+            $fullName = $userRow['First_Name'] . ' ' . $userRow['Last_Name'];
+            echo '<li>' . $fullName . ' <button onclick="removeUser(' . $userRow['ID'] . ')">Remove</button></li>';
+          } else {
+            echo '<li>Invalid user data</li>';
+          }
+        }
+        ?>
+      </ul>
+    </div>
+
+    <!-- Admins Tab -->
+    <div class="tab-pane fade" id="admins" role="tabpanel" aria-labelledby="admins-tab">
+      <ul>
+        <?php
+        // Display list of admins
+        while ($adminRow = $adminResult->fetch_assoc()) {
+          echo '<li>' . $adminRow['name'] . ' <button onclick="removeUser(' . $adminRow['id'] . ')">Remove</button></li>';
+        }
+        ?>
+      </ul>
+    </div>
+
+    <!-- Add New User/Admin Tab -->
+    <div class="tab-pane fade" id="add" role="tabpanel" aria-labelledby="add-tab">
+      <form method="post">
+        <label>Name:</label>
+        <input type="text" name="new_name" required><br>
+        <label>Email:</label>
+        <input type="email" name="new_email" required><br>
+        <label>Password:</label>
+        <input type="password" name="new_password" required><br>
+        <label>Is Admin:</label>
+        <input type="checkbox" name="is_admin"><br>
+        <button type="submit" name="add_user">Add</button>
+      </form>
+    </div>
+  </div>
+</div>
+      </section>
+      <?php
+      // Handle adding a new user/admin
+      if (isset($_POST['add_user'])) {
+          $newName = $_POST['new_name'];
+          $newEmail = $_POST['new_email'];
+          $newPassword = $_POST['new_password'];
+          $isAdmin = isset($_POST['is_admin']) ? 1 : 0;
+          
+          addUser($newName, $newEmail, $newPassword, $isAdmin);
+          // Redirect to refresh the page
+          header('Location: admin_users.php');
+          exit();
+      }
+      ?>
     </div>
   </section>
-  <!-- end booking section -->
-  <script>
-    function validateForm() {
-        // Get the selected date and time
-        var date_from = document.getElementById("date_from").value;
-        var time_from = document.getElementById("time_from").value;
-
-        // Convert the selected date and time to a Date object
-        var selectedDateTime = new Date(date_from + " " + time_from);
-
-        // Get the current internet time
-        var currentDateTime = new Date();
-
-        // Check if the selected date and time have already passed
-        if (selectedDateTime < currentDateTime) {
-            alert("Invalid date or time selection. Please choose a future date and time.");
-            return false; // Prevent form submission
-        }
-
-        return true; // Allow form submission
-    }
-</script>
 
  <!-- info section -->
 
@@ -203,7 +282,7 @@ if(isset($_SESSION['user_id'])) {
           <a class="" href="../main/gallery.php">Gallery</a>
         </li>
         <li class="">
-          <a class="" href="../user/user_login.php">Login</a>
+          <a class="" href="../user/login.php">Login</a>
         </li>
       </ul>
     </div>
@@ -266,6 +345,8 @@ if(isset($_SESSION['user_id'])) {
 
 <script type="text/javascript" src="../js/jquery-3.4.1.min.js"></script>
 <script type="text/javascript" src="../js/bootstrap.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
 <script>
 function openNav() {
@@ -278,4 +359,3 @@ function openNav() {
 </body>
 
 </html>
-

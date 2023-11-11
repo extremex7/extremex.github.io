@@ -42,6 +42,15 @@ function cancelBooking($bookingId) {
 
   <title>Grande Sports Center</title>
 
+  <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<!-- Place these after Bootstrap and jQuery imports -->
+
+
+
   <!-- slider stylesheet -->
   <link rel="stylesheet" type="text/css"
     href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.1.3/assets/owl.carousel.min.css" />
@@ -106,23 +115,7 @@ function cancelBooking($bookingId) {
 <body class="sub_page about_page">
   <div class="hero_area">
     <!-- header section strats -->
-    <?php
-    
-    if(isset($_SESSION['user_id'])) {
-    // Fetch user details from the database
-    $sql = "SELECT first_name FROM users WHERE id = ".$_SESSION['user_id'];
-    $result = $conn->query($sql);
-    $user = $result->fetch_assoc();
 
-    // Fetch bookings for the logged-in user
-    $bookingSql = "SELECT b.*, f.name AS facility_name
-    FROM booking b
-    INNER JOIN facilities f ON b.facility_id = f.id
-    WHERE b.client_id = ".$_SESSION['user_id'];
-    $bookingResult = $conn->query($bookingSql);
-
-    // Display dropdown menu with user name and links
-    echo '
     <header class="header_section">
     <div class="container">
       <nav class="navbar navbar-expand-lg custom_nav-container">
@@ -150,21 +143,16 @@ function cancelBooking($bookingId) {
             <div class="d-flex  flex-column flex-lg-row align-items-center">
               <ul class="navbar-nav  ">
                 <li class="nav-item">
-                  <a class="nav-link" href="../index.php">Home<span class="sr-only">(current)</span></a>
+                  <a class="nav-link" href="admin_dashboard.php">Dashboard<span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="myBooking.php">My Bookings</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="user_profile.php">Profile</a>
+                  <a class="nav-link" href="manage_users.php">Manage Users</a>
             <li class="nav-item">
                   <a class="nav-link" href="../user/logout.php">Logout</a>
-                </li>';
-            } else {
-              header('Location: user_login.php');
-                exit();
-            }
-            ?>
+                </li>
                 </ul>
               </div>
             </div>
@@ -173,8 +161,8 @@ function cancelBooking($bookingId) {
       </div>
     </section>
 
-    <!-- admin bookings data section -->
-    <section class="about_section layout_padding">
+  <!-- admin bookings data section -->
+  <section class="about_section layout_padding">
     <div class="container">
       <div class="heading_container">
         <h2>All Bookings</h2>
@@ -224,13 +212,13 @@ function cancelBooking($bookingId) {
                       <td><?php echo $schedule; ?></td>
                       <td><?php echo ucfirst($status); ?></td>
                       <td>
-                        <?php
-                          if ($status !== 'Cancelled') {
-                              echo '<button class="cancel-button" onclick="cancelBooking(' . $bookingId . ')">Cancel</button>';
-                          } else {
-                              echo 'Cancelled';
-                          }
-                        ?>
+                        <?php if ($status !== 'Cancelled') { ?>
+                          <button class="btn btn-primary" data-toggle="modal" data-target="#bookingActionsModal" data-booking-id="<?php echo $bookingId; ?>">
+                            Actions
+                          </button>
+                        <?php } else { ?>
+                          Cancelled
+                        <?php } ?>
                       </td>
                     </tr>
                     <?php
@@ -280,7 +268,7 @@ function cancelBooking($bookingId) {
           <a class="" href="../main/gallery.php">Gallery</a>
         </li>
         <li class="">
-          <a class="" href="#">Login</a>
+          <a class="" href="../user/user_login.php">Login</a>
         </li>
       </ul>
     </div>
@@ -340,44 +328,112 @@ function cancelBooking($bookingId) {
 </p>
 </section>
 <!-- footer section -->
+<!-- Bootstrap Modal for Booking Actions -->
+<div class="modal fade" id="bookingActionsModal" tabindex="-1" role="dialog" aria-labelledby="bookingActionsModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="bookingActionsModalLabel">Choose Action</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <label for="actionChoice">Choose an action:</label>
+        <select class="form-control" id="actionChoice">
+          <option value="cancel">Cancel</option>
+          <option value="confirm">Confirm</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="handleBookingAction()">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-<script type="text/javascript" src="../js/jquery-3.4.1.min.js"></script>
-<script type="text/javascript" src="../js/bootstrap.js"></script>
+
 <script>
     function cancelBooking(bookingId) {
-        if (confirm('Are you sure you want to cancel this booking?')) {
-            // Make an AJAX request to cancel the booking
-            $.ajax({
-                url: '../booking/cancel_booking.php', 
-                type: 'POST',
-                data: { bookingId: bookingId },
-                success: function (response) {
-                    if (response === 'success') {
-                        // Do something if the cancellation was successful, if needed
-                        // For example, update the UI to reflect the cancelled booking
-                        // Reload the page to update the booking status
-                        location.reload();
-                    } else {
-                        alert('Failed to cancel booking');
-                    }
-                },
-                error: function () {
-                    alert('An error occurred while cancelling the booking.');
-                }
-            });
-        }
+      if (confirm('Are you sure you want to cancel this booking?')) {
+        // Make an AJAX request to cancel the booking
+        $.ajax({
+          url: 'cancel_booking.php', // Path to your cancellation logic
+          type: 'POST',
+          data: { bookingId: bookingId },
+          success: function (response) {
+            if (response === 'success') {
+              alert('Booking cancelled successfully');
+              // Reload the page to update the booking status
+              location.reload();
+            } else {
+              alert('Failed to cancel booking');
+            }
+          }
+        });
+      }
     }
-</script>
-
+  </script>
+    <script type="text/javascript" src="../js/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript" src="../js/bootstrap.js"></script>
+    <script>
+    function openNav() {
+    document.getElementById("myNav").classList.toggle("menu_width");
+    document
+        .querySelector(".custom_menu-btn")
+        .classList.toggle("menu_btn-style");
+    }
+    </script>
 
 <script>
-function openNav() {
-  document.getElementById("myNav").classList.toggle("menu_width");
-  document
-    .querySelector(".custom_menu-btn")
-    .classList.toggle("menu_btn-style");
+  $('#bookingActionsModal').on('show.bs.modal', function (event) {
+    const button = $(event.relatedTarget); // Button that triggered the modal
+    const bookingId = button.data('booking-id'); // Extract booking ID from data attribute
+
+    // Update the modal with the booking ID
+    const modal = $(this);
+    modal.find('.modal-title').text('Booking ID: ' + bookingId);
+    modal.find('#modalBookingId').text(bookingId);
+    modal.find('#actionChoice').data('booking-id', bookingId);
+  });
+
+  function handleBookingAction() {
+  const bookingId = $('#actionChoice').data('booking-id');
+  const actionChoice = $('#actionChoice').val();
+
+  // Log the action and bookingId to the console for debugging
+  console.log('Action:', actionChoice, 'for Booking ID:', bookingId);
+
+  // Send an AJAX request to the server to process the action
+  $.ajax({
+    url: 'process_booking_action.php', // Replace with the actual server-side endpoint
+    type: 'POST',
+    data: {
+      bookingId: bookingId,
+      action: actionChoice
+    },
+    success: function (response) {
+      console.log('Response:', response);  // Log the response from the server
+      if (response === 'success') {
+        alert('Booking ' + actionChoice + 'ed successfully');
+        // Reload the page to update the booking status
+        location.reload();
+      } else {
+        alert('Failed to ' + actionChoice + ' booking');
+      }
+    },
+    error: function (error) {
+      console.error('Error:', error);  // Log any errors that occur
+      alert('An error occurred while processing the action');
+    }
+  });
+
+  // Close the modal
+  $('#bookingActionsModal').modal('hide');
 }
 </script>
+
 </body>
 
 </html>
