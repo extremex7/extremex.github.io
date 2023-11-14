@@ -66,6 +66,7 @@ function cancelBooking($bookingId) {
   <!-- responsive style -->
   <link href="../css/responsive.css" rel="stylesheet" />
   <style>
+
   .navbar-brand {
     display: flex;
     align-items: center;
@@ -146,7 +147,7 @@ function cancelBooking($bookingId) {
                   <a class="nav-link" href="admin_dashboard.php">Dashboard<span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="myBooking.php">My Bookings</a>
+                  <a class="nav-link" href="view_bookings.php">View Bookings</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="manage_users.php">Manage Users</a>
@@ -330,7 +331,7 @@ function cancelBooking($bookingId) {
 <!-- footer section -->
 <!-- Bootstrap Modal for Booking Actions -->
 <div class="modal fade" id="bookingActionsModal" tabindex="-1" role="dialog" aria-labelledby="bookingActionsModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
+  <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="bookingActionsModalLabel">Choose Action</h5>
@@ -353,7 +354,8 @@ function cancelBooking($bookingId) {
   </div>
 </div>
 
-
+<!-- Add this div wrapper with a unique ID -->
+<div id="bookingActionsModalWrapper"></div>
 <script>
     function cancelBooking(bookingId) {
       if (confirm('Are you sure you want to cancel this booking?')) {
@@ -387,6 +389,14 @@ function cancelBooking($bookingId) {
     </script>
 
 <script>
+  $(document).ready(function () {
+    $('#bookingActionsModal').on('show.bs.modal', function (event) {
+      const modalWrapper = $('#bookingActionsModalWrapper');
+      modalWrapper.css('z-index', 1050); // Adjust the z-index value as needed
+      modalWrapper.append($('#bookingActionsModal'));
+    });
+  });
+  
   $('#bookingActionsModal').on('show.bs.modal', function (event) {
     const button = $(event.relatedTarget); // Button that triggered the modal
     const bookingId = button.data('booking-id'); // Extract booking ID from data attribute

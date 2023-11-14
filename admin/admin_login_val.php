@@ -1,4 +1,19 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+// ...
+
+if ($result->num_rows == 1) {
+    // ...
+
+    // Debugging statements
+    echo "Query executed successfully.<br>";
+    echo "Number of rows: " . $result->num_rows . "<br>";
+} else {
+    echo "Query failed.<br>";
+}
+
 session_start();
 require_once('../val/db_connect.php');
 

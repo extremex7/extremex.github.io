@@ -105,7 +105,7 @@ if(isset($_SESSION['admin_id'])){
 <section class="about_section layout_padding">
 <div class="max-w-md mx-auto my-8 bg-white p-6 rounded-md shadow-md">
     <h1 class="text-xl font-medium mb-4">Admin Login</h1>
-    <form action="admin_login_val.php" method="post">
+    <form action="admin_login_val.php" method="POST">
       <div class="mb-4">
         <label class="block text-gray-700 font-medium mb-2" for="email">Email</label>
         <input class="border border-gray-300 p-2 w-full" type="email" id="email" name="email" required>
@@ -117,7 +117,6 @@ if(isset($_SESSION['admin_id'])){
       <div class="mb-6">
         <button class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700" type="submit">Login</button>
       </div>
-      <p class="text-gray-600 text-sm">Don't have an account? <a class="text-blue-500" href="admin_reg.php">Register here</a>.</p>
     </form>
      </div>
 </section>
