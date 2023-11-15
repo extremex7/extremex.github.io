@@ -111,41 +111,45 @@ if(isset($_SESSION['user_id'])) {
       </div>
     </section>
 
-  <!-- booking section -->
+<!-- booking section -->
 
-  <section class="about_section layout_padding">
-    <div class="container">
-      <div class="heading_container">
-        <h2>Booking
-        </h2>
-      </div>
-      <div class="box">
-      <form action="process_booking.php" method="post" onsubmit="return validateForm()">
-    <label for="facility">Select Facility:</label>
-    <select name="facility" id="facility">
-        <!-- Options for facility selection -->
-        <option value="FC001">Futsal A</option>
-        <option value="FC002">Futsal B</option>
-        <option value="FC003">Basketball</option>
-    </select>
-    <br>
-    <label for="date">Preferred Date From:</label>
-    <input type="date" name="date_from" id="date_from">
-    <br>
-    <label for="date">Preferred Date to:</label>
-    <input type="date" name="date_to" id="date_to">
-    <br>
-    <label for="time">Preferred Time From:</label>
-    <input type="time" name="time_from" id="time_from">
-    <br>
-    <label for="time">Preferred Time To:</label>
-    <input type="time" name="time_to" id="time_to">
-    <br>
-    <input type="submit" value="Submit">
-</form>
-      </div>
+<section class="about_section layout_padding">
+  <div class="container">
+    <div class="heading_container">
+      <h2>Booking</h2>
     </div>
-  </section>
+    <div class="box">
+    <form id="bookingForm" action="process_booking.php" method="post" onsubmit="return validateForm();">
+        <label for="facility">Select Facility:</label>
+        <select name="facility" id="facility" onchange="updatePrice()">
+          <!-- Options for facility selection -->
+          <option value="FC001">Futsal A</option>
+          <option value="FC002">Futsal B</option>
+          <option value="FC003">Basketball</option>
+        </select>
+        <br>
+
+        <!-- Display the price here -->
+        <label for="price">Price:</label>
+        <span id="priceDisplay"></span>
+        <br>
+
+        <label for="date">Preferred Date:</label>
+        <input type="date" name="date_from" id="date_from">
+        <br>
+        <label for="time">Preferred Time From:</label>
+        <input type="time" name="time_from" id="time_from">
+        <br>
+        <label for="time">Preferred Time To:</label>
+        <input type="time" name="time_to" id="time_to">
+        <br>
+        <div id="availabilityDisplay"></div> <!-- Display availability here -->
+        <br>
+        <input type="submit" value="Submit">
+      </form>
+    </div>
+  </div>
+</section>
   <!-- end booking section -->
   <script>
     function validateForm() {
@@ -167,6 +171,59 @@ if(isset($_SESSION['user_id'])) {
 
         return true; // Allow form submission
     }
+    function updatePrice() {
+  // Get the selected facility
+  var facility = document.getElementById("facility").value;
+
+  // Create a new XMLHttpRequest object
+  var xhr = new XMLHttpRequest();
+
+  // Configure it: GET-request for the getPrice.php script
+  xhr.open('GET', 'getPrice.php?facility=' + facility, true);
+
+  // Set up a callback function to handle the response
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState == 4 && xhr.status == 200) {
+      // Update the price display with the received data
+      document.getElementById("priceDisplay").innerText = xhr.responseText;
+    }
+  };
+
+  // Send the request
+  xhr.send();
+}
+function checkAvailability() {
+    // Get the selected facility, time_from, and time_to
+    var facility = document.getElementById("facility").value;
+    var timeFrom = document.getElementById("time_from").value;
+    var timeTo = document.getElementById("time_to").value;
+
+    // Create a new XMLHttpRequest object
+    var xhr = new XMLHttpRequest();
+
+    // Configure it: POST request for the checkAvailability.php script
+    xhr.open('POST', 'checkAvailability.php', true);
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+    // Set up a callback function to handle the response
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            // Update the availability display with the received data
+            document.getElementById("availabilityDisplay").innerText = xhr.responseText;
+        }
+    };
+
+    // Send the request with the form data
+    xhr.send('facility=' + encodeURIComponent(facility) + '&time_from=' + encodeURIComponent(timeFrom) + '&time_to=' + encodeURIComponent(timeTo));
+}
+window.onload = function() {
+    updatePrice();
+    checkAvailability();
+    document.getElementById("bookingForm").addEventListener("input", function () {
+    checkAvailability();
+});
+
+  };
 </script>
 
  <!-- info section -->

@@ -184,7 +184,7 @@ if(isset($_SESSION['user_id'])) {
               <img src="../images/link.png" alt="">
             </a>
             <h6>
-              Book for 1200/hr
+              Book
             </h6>
           </div>
         </div>
@@ -198,7 +198,7 @@ if(isset($_SESSION['user_id'])) {
               <img src="../images/link.png" alt="">
             </a>
             <h6>
-              Book for 1000/hr
+              Book
             </h6>
           </div>
         </div>
@@ -212,7 +212,7 @@ if(isset($_SESSION['user_id'])) {
               <img src="../images/link.png" alt="">
             </a>
             <h6>
-              Book for 1500/hr
+              Book
             </h6>
           </div>
         </div>

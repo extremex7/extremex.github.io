@@ -206,7 +206,7 @@ function cancelBooking($bookingId) {
                     ?>
                     <tr>
                       <td><?php echo $count++; ?></td>
-                      <td><?php echo $dateFrom . ' to ' . $dateTo; ?></td>
+                      <td><?php echo $dateFrom; ?></td>
                       <td><?php echo $referenceCode; ?></td>
                       <td><?php echo $userName; ?></td>
                       <td><?php echo $facilityName; ?></td>

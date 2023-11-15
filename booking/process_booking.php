@@ -1,15 +1,14 @@
 <?php
+session_start();
+
 // Retrieve form data
 $facility = $_POST['facility'];
 $date_from = $_POST['date_from'];
-$date_to = $_POST['date_to'];
 $time_from = $_POST['time_from'];
 $time_to = $_POST['time_to'];
-$clientName = ""; // Retrieve client name from the logged-in session
 
-// Retrieve client ID from the logged-in session or database
+// Retrieve client ID from the logged-in session
 $clientId = ""; // Initialize the variable
-session_start(); // Start the session
 
 if (isset($_SESSION['user_id'])) {
     // If the user is logged in and their ID is stored in the session
@@ -23,42 +22,64 @@ if (isset($_SESSION['user_id'])) {
 
 // Perform necessary validations on the form data
 
-// Store the booking in the database
+// Create a connection to the database
 $servername = "localhost";
 $username = "root";
 $password = "";
 $database = "futsal";
 
-// Create a connection to the database
+// Check for connection errors
 $conn = new mysqli($servername, $username, $password, $database);
 
-// Check for connection errors
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Generate the reference code (using a combination of values)
+// Check availability
+$availabilityCheckSql = "SELECT * FROM booking 
+                         WHERE facility_id = (SELECT ID FROM facilities WHERE facility_code = ?) 
+                         AND date_from = ? 
+                         AND (
+                            (time_from <= ? AND time_to >= ?) 
+                            OR (time_from <= ? AND time_to >= ?)
+                            OR (time_from >= ? AND time_to <= ?)
+                         )";
+
+$stmt = $conn->prepare($availabilityCheckSql);
+$stmt->bind_param('ssssssss', $facility, $date_from, $time_from, $time_from, $time_to, $time_to, $time_from, $time_to);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows > 0) {
+    die('<script>alert("The selected date and time are not available. Please choose a different time."); window.history.back();</script>');
+}
+
+$stmt->close();
+
+// Generate the reference code
 $refCode = generateReferenceCode($clientId, $facility);
 
-// Set the booking status as "Pending" (you can change this to "Accepted" or "Cancelled" based on your requirements)
+// Set the booking status as "Pending"
 $status = "Pending";
 
 // Get the current date and time from the user's machine
 $dateCreated = date('Y-m-d H:i:s');
 
 // Insert the booking into the database
-$sql = "INSERT INTO booking (ref_code, client_id, facility_id, date_from, date_to, time_from, time_to, status, date_created)
-        VALUES ('$refCode', '$clientId', (SELECT ID FROM facilities WHERE facility_code = '$facility'), '$date_from', '$date_to', '$time_from', '$time_to', '$status', '$dateCreated')";
+$sql = "INSERT INTO booking (ref_code, client_id, facility_id, date_from, time_from, time_to, status, date_created)
+        VALUES (?, ?, (SELECT ID FROM facilities WHERE facility_code = ?), ?, ?, ?, ?, ?)";
 
-if ($conn->query($sql) === TRUE) {
-    header('Location: book_success.php');
-    exit(); 
+$stmt = $conn->prepare($sql);
+$stmt->bind_param('ssssssss', $refCode, $clientId, $facility, $date_from, $time_from, $time_to, $status, $dateCreated);
+
+if ($stmt->execute()) {
+    die('<script>alert("Booking successful."); window.history.back();</script>');
 } else {
-    header('Location: book_fail.php');
-    exit();
+    die('<script>alert("Failed to book. Please try again."); window.history.back();</script>');
 }
 
 // Close the database connection
+$stmt->close();
 $conn->close();
 
 // Function to generate a unique reference code

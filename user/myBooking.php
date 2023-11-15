@@ -1,29 +1,29 @@
-<?php 
+<?php
 session_start();
 require_once '../val/db_connect.php';
+
 // Function to cancel a booking
-function cancelBooking($bookingId) {
-  // Check if the booking exists
-  global $conn; // Add this line to access the $conn variable inside the function
+function cancelBooking($bookingId)
+{
+    global $conn; // Add this line to access the $conn variable inside the function
 
-  $bookingCheckSql = "SELECT * FROM booking WHERE id = $bookingId";
-  $bookingCheckResult = $conn->query($bookingCheckSql);
+    // Check if the booking belongs to the logged-in user
+    $bookingCheckSql = "SELECT * FROM booking WHERE id = $bookingId AND client_id = {$_SESSION['user_id']}";
+    $bookingCheckResult = $conn->query($bookingCheckSql);
 
-  if ($bookingCheckResult->num_rows > 0) {
-      // Booking exists, update the status to "Cancelled"
-      $cancelBookingSql = "UPDATE booking SET status = 'Cancelled' WHERE id = $bookingId";
+    if ($bookingCheckResult->num_rows > 0) {
+        // Booking exists, update the status to "Cancelled"
+        $cancelBookingSql = "UPDATE booking SET status = 'Cancelled' WHERE id = $bookingId";
 
-      if ($conn->query($cancelBookingSql) === TRUE) {
-          echo "Booking with ID $bookingId has been cancelled successfully.";
-      } else {
-          echo "Error cancelling the booking: " . $conn->error;
-      }
-  } else {
-      echo "Booking with ID $bookingId does not exist.";
-  }
+        if ($conn->query($cancelBookingSql) === TRUE) {
+            echo "Booking with ID $bookingId has been cancelled successfully.";
+        } else {
+            echo "Error cancelling the booking: " . $conn->error;
+        }
+    } else {
+        echo "Booking with ID $bookingId does not exist or does not belong to the current user.";
+    }
 }
-
-
 ?>
 
 <!DOCTYPE html>
@@ -194,13 +194,15 @@ function cancelBooking($bookingId) {
             </tr>
           </thead>
           <tbody>
-            <?php
-            // Fetch all bookings from the database
-            $bookingSql = "SELECT b.*, f.name AS facility_name, u.first_name, u.last_name
-                           FROM booking b
-                           INNER JOIN facilities f ON b.facility_id = f.id
-                           INNER JOIN users u ON b.client_id = u.id";
-            $bookingResult = $conn->query($bookingSql);
+          <?php
+                  // Fetch bookings for the logged-in user
+                  $bookingSql = "SELECT b.*, f.name AS facility_name, u.first_name, u.last_name
+                  FROM booking b
+                  INNER JOIN facilities f ON b.facility_id = f.id
+                  INNER JOIN users u ON b.client_id = u.id
+                  WHERE b.client_id = " . $_SESSION['user_id'];
+                  $bookingResult = $conn->query($bookingSql);
+                  
 
             if ($bookingResult->num_rows > 0) {
                 $count = 1;
@@ -217,7 +219,7 @@ function cancelBooking($bookingId) {
                     ?>
                     <tr>
                       <td><?php echo $count++; ?></td>
-                      <td><?php echo $dateFrom . ' to ' . $dateTo; ?></td>
+                      <td><?php echo $dateFrom; ?></td>
                       <td><?php echo $referenceCode; ?></td>
                       <td><?php echo $userName; ?></td>
                       <td><?php echo $facilityName; ?></td>

@@ -77,19 +77,39 @@ session_start();
 require_once '../val/db_connect.php';
 ?>
 <?php 
-function removeUser($userId) {
-    global $conn;
-    
-    // Your removal logic here
-    // ...
-}
-
 // Function to add a new user or admin
-function addUser($name, $email, $password, $isAdmin) {
-    global $conn;
-    
-    // Your addition logic here
-    // ...
+function addUser($first_name, $last_name, $email, $password, $phone_number, $gender, $isAdmin) {
+  global $conn;
+
+  // Hash the password for security
+  $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+  // Check if it's an admin
+  if ($isAdmin) {
+      // If it's admin, insert into the admin table
+      $fullName = $first_name . ' ' . $last_name;
+      $insertAdminSql = "INSERT INTO admin (name, email, password, phone, gender) VALUES (?, ?, ?, ?, ?)";
+      $stmt = $conn->prepare($insertAdminSql);
+      $stmt->bind_param("sssss", $fullName, $email, $hashedPassword, $phone_number, $gender);
+  } else {
+      // If it's not admin, insert into the users table
+      $insertUserSql = "INSERT INTO users (First_Name, Last_Name, Email, Password, Phone) VALUES (?, ?, ?, ?, ?)";
+      $stmt = $conn->prepare($insertUserSql);
+      $stmt->bind_param("sssss", $first_name, $last_name, $email, $hashedPassword, $phone_number);
+  }
+
+  // Execute the prepared statement
+  if ($stmt->execute()) {
+      // Inserted successfully
+      return true;
+  } else {
+      // Error in insertion
+      echo "Error: " . $stmt->error;
+      return false;
+  }
+
+  // Close the statement
+  $stmt->close();
 }
 
 // Fetch all users from the database
@@ -169,82 +189,180 @@ if(isset($_SESSION['admin_id'])) {
     <h2>Users and Admins Management</h2>
   </div>
 
-  <!-- Nav tabs -->
-  <ul class="nav nav-tabs" id="myTab" role="tablist">
+<!-- Nav tabs -->
+<ul class="nav nav-tabs" id="myTab" role="tablist">
     <li class="nav-item">
-      <a class="nav-link active" id="users-tab" data-toggle="tab" href="#users" role="tab" aria-controls="users" aria-selected="true">Users</a>
+        <a class="nav-link active" id="users-tab" data-toggle="tab" href="#users-content" role="tab" aria-controls="users" aria-selected="true">Users</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" id="admins-tab" data-toggle="tab" href="#admins" role="tab" aria-controls="admins" aria-selected="false">Admins</a>
+        <a class="nav-link" id="admins-tab" data-toggle="tab" href="#admins-content" role="tab" aria-controls="admins" aria-selected="false">Admins</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" id="add-tab" data-toggle="tab" href="#add" role="tab" aria-controls="add" aria-selected="false">Add New User/Admin</a>
+        <a class="nav-link" id="add-tab" data-toggle="tab" href="#add" role="tab" aria-controls="add" aria-selected="false">Add New User/Admin</a>
     </li>
-  </ul>
+</ul>
 
-  <!-- Tab panes -->
-  <div class="tab-content">
-    <!-- Users Tab -->
-    <div class="tab-pane fade show active" id="users" role="tabpanel" aria-labelledby="users-tab">
-      <ul>
-        <?php
-        // Display list of users
-        while ($userRow = $userResult->fetch_assoc()) {
-          // Check if the keys 'id', 'first_name', and 'last_name' exist in $userRow
-          if (isset($userRow['ID']) && isset($userRow['First_Name']) && isset($userRow['Last_Name'])) {
-            $fullName = $userRow['First_Name'] . ' ' . $userRow['Last_Name'];
-            echo '<li>' . $fullName . ' <button onclick="removeUser(' . $userRow['ID'] . ')">Remove</button></li>';
-          } else {
-            echo '<li>Invalid user data</li>';
-          }
-        }
-        ?>
-      </ul>
-    </div>
+<!-- Tab content -->
+<div class="tab-content">
+    <!-- Users Tab Content -->
+    <div class="tab-pane fade show active" id="users-content" role="tabpanel" aria-labelledby="users-tab">
+        <table class="table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Gender</th>
+                <th>Phone</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            // Reset the result set pointer to the beginning
+            $userResult->data_seek(0);
 
-    <!-- Admins Tab -->
-    <div class="tab-pane fade" id="admins" role="tabpanel" aria-labelledby="admins-tab">
-      <ul>
-        <?php
-        // Display list of admins
-        while ($adminRow = $adminResult->fetch_assoc()) {
-          echo '<li>' . $adminRow['name'] . ' <button onclick="removeUser(' . $adminRow['id'] . ')">Remove</button></li>';
-        }
-        ?>
-      </ul>
-    </div>
-
-    <!-- Add New User/Admin Tab -->
-    <div class="tab-pane fade" id="add" role="tabpanel" aria-labelledby="add-tab">
-      <form method="post">
-        <label>Name:</label>
-        <input type="text" name="new_name" required><br>
-        <label>Email:</label>
-        <input type="email" name="new_email" required><br>
-        <label>Password:</label>
-        <input type="password" name="new_password" required><br>
-        <label>Is Admin:</label>
-        <input type="checkbox" name="is_admin"><br>
-        <button type="submit" name="add_user">Add</button>
-      </form>
-    </div>
-  </div>
+            // Display list of users in a table
+            $count = 1;
+            while ($userRow = $userResult->fetch_assoc()) {
+                // Check if the keys 'ID', 'First_Name', 'Last_Name', 'Gender', and 'Phone' exist in $userRow
+                if (isset($userRow['ID'], $userRow['First_Name'], $userRow['Last_Name'], $userRow['Gender'], $userRow['Phone'])) {
+                    $fullName = $userRow['First_Name'] . ' ' . $userRow['Last_Name'];
+                    echo '<tr>';
+                    echo '<td>' . $count . '</td>';
+                    echo '<td>' . $fullName . '</td>';
+                    echo '<td>' . $userRow['Gender'] . '</td>';
+                    echo '<td>' . $userRow['Phone'] . '</td>';
+                    echo '<td><a href="edit_user.php?id=' . $userRow['ID'] . '">Edit</a></td>';
+                    echo '</tr>';
+                    $count++;
+                } else {
+                    echo '<tr><td colspan="5"></td></tr>';
+                }
+            }
+            ?>
+        </tbody>
+    </table>
 </div>
+
+    <!-- Admins Tab Content -->
+    <div class="tab-pane fade" id="admins-content" role="tabpanel" aria-labelledby="admins-tab">
+        <table class="table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Gender</th>
+                <th>Phone</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            // Reset the result set pointer to the beginning
+            $adminResult->data_seek(0);
+
+            // Display list of admins in a table
+            $count = 1;
+            while ($adminRow = $adminResult->fetch_assoc()) {
+                // Check if the keys 'id', 'name', 'gender', and 'phone' exist in $adminRow
+                if (isset($adminRow['id'], $adminRow['name'], $adminRow['gender'], $adminRow['phone'])) {
+                    echo '<tr>';
+                    echo '<td>' . $count . '</td>';
+                    echo '<td>' . $adminRow['name'] . '</td>';
+                    echo '<td>' . $adminRow['gender'] . '</td>';
+                    echo '<td>' . $adminRow['phone'] . '</td>';
+                    echo '<td>';
+                    echo '<a href="edit_admin.php?id=' . $adminRow['id'] . '">Edit</a>';
+                    echo '</td>';
+                    echo '</tr>';
+                    $count++;
+                } else {
+                    echo '<tr><td colspan="5"></td></tr>';
+                }
+            }
+            ?>
+        </tbody>
+    </table>
+</div>
+
+
+<!-- Add New User/Admin Tab Content -->
+<div class="tab-pane fade" id="add" role="tabpanel" aria-labelledby="add-tab">
+    <form method="post" class="mt-4">
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="new_first_name">First Name:</label>
+                <input type="text" class="form-control" id="new_first_name" name="new_first_name" required>
+            </div>
+
+            <div class="form-group col-md-6">
+                <label for="new_last_name">Last Name:</label>
+                <input type="text" class="form-control" id="new_last_name" name="new_last_name" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="new_email">Email:</label>
+            <input type="email" class="form-control" id="new_email" name="new_email" required>
+        </div>
+
+        <div class="form-group">
+            <label for="new_password">Password:</label>
+            <input type="password" class="form-control" id="new_password" name="new_password" required>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="new_phone_number">Phone Number:</label>
+                <input type="text" class="form-control" id="new_phone_number" name="new_phone_number" required>
+            </div>
+
+            <div class="form-group col-md-6">
+                <label for="new_gender">Gender:</label>
+                <select class="form-control" id="new_gender" name="new_gender" required>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="is_admin" name="is_admin">
+            <label class="form-check-label" for="is_admin">Is Admin</label>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3" name="add_user">Add</button>
+    </form>
+</div>
+
       </section>
       <?php
-      // Handle adding a new user/admin
-      if (isset($_POST['add_user'])) {
-          $newName = $_POST['new_name'];
-          $newEmail = $_POST['new_email'];
-          $newPassword = $_POST['new_password'];
-          $isAdmin = isset($_POST['is_admin']) ? 1 : 0;
-          
-          addUser($newName, $newEmail, $newPassword, $isAdmin);
-          // Redirect to refresh the page
-          header('Location: admin_users.php');
-          exit();
+// Handle adding a new user/admin
+if (isset($_POST['add_user'])) {
+  $newFirstName = $_POST['new_first_name'];
+  $newLastName = $_POST['new_last_name'];
+  $newEmail = $_POST['new_email'];
+  $newPassword = $_POST['new_password'];
+  $newPhoneNumber = $_POST['new_phone_number'];
+  $newGender = $_POST['new_gender'];
+
+  $isAdmin = isset($_POST['is_admin']) ? 1 : 0;
+
+  // Check if required fields are not empty
+  if (empty($newFirstName) || empty($newLastName) || empty($newEmail) || empty($newPassword) || empty($newPhoneNumber) || empty($newGender)) {
+      echo '<script>alert("Please fill in all required fields.");</script>';
+  } else {
+      // Call the function to add user/admin
+      if (addUser($newFirstName, $newLastName, $newEmail, $newPassword, $newPhoneNumber, $newGender, $isAdmin)) {
+          echo '<script>alert("User/Admin added successfully.");</script>';
+      } else {
+          echo '<script>alert("Error adding User/Admin. Please try again.");</script>';
       }
-      ?>
+  }
+}
+?>
+
     </div>
   </section>
 
