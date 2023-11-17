@@ -141,10 +141,7 @@ if(isset($_SESSION['user_id'])) {
         <input type="time" name="time_from" id="time_from">
         <br>
         <label for="time">Preferred Time To:</label>
-        <input type="time" name="time_to" id="time_to">
-        <br>
-        <div id="availabilityDisplay"></div> <!-- Display availability here -->
-        <br>
+        <input type="time" name="time_to" id="time_to"><br>
         <input type="submit" value="Submit">
       </form>
     </div>
@@ -191,39 +188,8 @@ if(isset($_SESSION['user_id'])) {
 
   // Send the request
   xhr.send();
-}
-function checkAvailability() {
-    // Get the selected facility, time_from, and time_to
-    var facility = document.getElementById("facility").value;
-    var timeFrom = document.getElementById("time_from").value;
-    var timeTo = document.getElementById("time_to").value;
-
-    // Create a new XMLHttpRequest object
-    var xhr = new XMLHttpRequest();
-
-    // Configure it: POST request for the checkAvailability.php script
-    xhr.open('POST', 'checkAvailability.php', true);
-    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-
-    // Set up a callback function to handle the response
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState == 4 && xhr.status == 200) {
-            // Update the availability display with the received data
-            document.getElementById("availabilityDisplay").innerText = xhr.responseText;
-        }
-    };
-
-    // Send the request with the form data
-    xhr.send('facility=' + encodeURIComponent(facility) + '&time_from=' + encodeURIComponent(timeFrom) + '&time_to=' + encodeURIComponent(timeTo));
-}
-window.onload = function() {
-    updatePrice();
-    checkAvailability();
-    document.getElementById("bookingForm").addEventListener("input", function () {
-    checkAvailability();
-});
-
-  };
+} window.onload = function() {
+    updatePrice(); };
 </script>
 
  <!-- info section -->
